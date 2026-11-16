@@ -14,45 +14,77 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Database\Eloquent\Model; 
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
     protected static ?string $recordTitleAttribute = 'name';
-    public static function getAuthorizationResponse(string $action, ?Model $record = null): Response
-    {
-        if (auth()->user()->isAdmin()) {
-            return Response::allow();
-        }
-        return Response::deny();
-    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $navigationLabel = 'User Management';
+
+    /**
+     * Configure the form schema for user resource.
+     */
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);
     }
 
+    /**
+     * Configure the table layout for user resource.
+     */
     public static function table(Table $table): Table
     {
         return UsersTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
+    /**
+     * Get the registered pages for this resource.
+     */
     public static function getPages(): array
     {
-        return [
-            'index' => ListUsers::route('/'),
+        $userPagesMapping = [
+            'index'  => ListUsers::route('/'),
             'create' => CreateUser::route('/create'),
-            'edit' => EditUser::route('/{record}/edit'),
+            'edit'   => EditUser::route('/{record}/edit'),
         ];
+
+        return $userPagesMapping;
+    }
+
+    /**
+     * Get relationship definitions.
+     */
+    public static function getRelations(): array
+    {
+        $relationList = [
+            //
+        ];
+
+        return $relationList;
+    }
+
+    /**
+     * Authorize actions for the user resource.
+     */
+    public static function getAuthorizationResponse(string $action, ?Model $record = null): Response
+    {
+        if (auth()->user()->isAdmin() === true) {
+            return Response::allow();
+        }
+
+        return Response::deny();
+    }
+
+    /**
+     * Define global search attributes.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email'];
     }
 }

@@ -19,16 +19,12 @@ use Illuminate\Database\Eloquent\Model;
 class BookResource extends Resource
 {
     protected static ?string $model = Book::class;
+
     protected static ?string $recordTitleAttribute = 'title';
-    public static function getAuthorizationResponse(string $action, ?Model $record = null): Response
-    {
-        if (auth()->user()->isAdmin() || $action === 'viewAny') {
-            return Response::allow();
-        }
-        return Response::deny();
-    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?string $navigationLabel = 'Library Books';
 
     public static function form(Schema $schema): Schema
     {
@@ -40,6 +36,17 @@ class BookResource extends Resource
         return BooksTable::configure($table);
     }
 
+    public static function getPages(): array
+    {
+        $resourcePages = [
+            'index'  => ListBooks::route('/'),
+            'create' => CreateBook::route('/create'),
+            'edit'   => EditBook::route('/{record}/edit'),
+        ];
+
+        return $resourcePages;
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -47,12 +54,17 @@ class BookResource extends Resource
         ];
     }
 
-    public static function getPages(): array
+    public static function getAuthorizationResponse(string $action, ?Model $record = null): Response
     {
-        return [
-            'index' => ListBooks::route('/'),
-            'create' => CreateBook::route('/create'),
-            'edit' => EditBook::route('/{record}/edit'),
-        ];
+        if (auth()->user()->isAdmin() || $action === 'viewAny') {
+            return Response::allow();
+        }
+
+        return Response::deny();
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'author', 'publisher'];
     }
 }

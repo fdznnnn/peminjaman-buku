@@ -7,23 +7,42 @@ use Filament\Schemas\Schema;
 
 class BookForm
 {
+    /**
+     * Configure the schema components for the book resource form.
+     */
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('title')
-                    ->required(),
-                TextInput::make('author')
-                    ->required(),
-                TextInput::make('publisher')
-                    ->required(),
-                TextInput::make('year')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('stock')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-            ]);
+        $fields = [
+            TextInput::make('title')
+                ->label('Title')
+                ->placeholder('Enter book title')
+                ->required()
+                ->maxLength(255),
+
+            TextInput::make('author')
+                ->label('Author')
+                ->placeholder('Enter author name')
+                ->required()
+                ->maxLength(255),
+
+            TextInput::make('publisher')
+                ->label('Publisher')
+                ->placeholder('Enter publisher name')
+                ->required()
+                ->maxLength(255),
+
+            TextInput::make('year')
+                ->label('Publication Year')
+                ->numeric()
+                ->required(),
+
+            TextInput::make('stock')
+                ->label('Stock Quantity')
+                ->numeric()
+                ->default(0)
+                ->required(),
+        ];
+
+        return $schema->components($fields);
     }
 }
